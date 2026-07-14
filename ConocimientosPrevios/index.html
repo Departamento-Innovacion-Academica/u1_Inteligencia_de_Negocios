@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unidad Inteligencia de Negocios - Interfaz Educativa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-soft: #a394ff;
+            --secondary-soft: #6352cf;
+            --bg-dark: #483C9A;
+            --card-surface: rgba(72, 60, 154, 0.75);
+            --text-main: #f0edff;
+            --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 60px 20px;
+            box-sizing: border-box;
+        }
+
+        /* Instrucción flotante sutil */
+        .instruction {
+            position: fixed;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(163, 148, 255, 0.3);
+            color: var(--primary-soft);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            animation: floatAnim 4s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        @keyframes floatAnim {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .card-container {
+            display: flex;
+            gap: 40px;
+            z-index: 1;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            width: 360px;
+            height: 480px;
+            background: var(--card-surface);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 35px;
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        /* Imágenes de fondo adaptadas al tema de analítica de datos */
+        .card-bg-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: saturate(0.5) brightness(0.25);
+            transition: var(--transition-smooth);
+            z-index: -1;
+        }
+
+        .card:hover {
+            transform: translateY(-15px);
+            border-color: rgba(163, 148, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card:hover .card-bg-img {
+            transform: scale(1.1);
+            filter: saturate(0.8) brightness(0.35);
+        }
+
+        .card h2 {
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.6rem;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Ventana Emergente Estilo Suave */
+        .modal {
+            visibility: hidden;
+            opacity: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(22, 17, 54, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #2f2575;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 85vh;
+            padding: 50px;
+            border-radius: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            overflow-y: auto;
+            white-space: pre-line;
+            line-height: 1.7;
+            font-weight: 300;
+            color: #e5e1fc;
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal h3 {
+            margin-top: 0;
+            color: var(--primary-soft);
+            font-size: 1.8rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        /* Rejilla interactiva interna (Flip Cards) para los Conocimientos Previos */
+        .grid-knowledge {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flip-card-front {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(163, 148, 255, 0.2);
+            color: #fff;
+        }
+
+        .flip-card-front h4 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--primary-soft);
+            text-align: center;
+        }
+
+        .flip-card-front .click-hint {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .flip-card-back {
+            background: #1c1549;
+            border: 1px solid var(--primary-soft);
+            color: #e5e1fc;
+            transform: rotateY(180deg);
+            text-align: left;
+            font-size: 0.85rem;
+            overflow-y: auto;
+            justify-content: flex-start;
+        }
+
+        /* Lista de Resultados de Aprendizaje */
+        .learning-outcomes {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .outcome-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--primary-soft);
+            padding: 20px 25px;
+            border-radius: 0 16px 16px 0;
+        }
+
+        .outcome-num {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary-soft);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .outcome-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 8px 0;
+        }
+
+        .outcome-desc {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #fff;
+            font-size: 20px;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 80, 80, 0.2);
+            color: #ff5050;
+            transform: rotate(90deg);
+        }
+
+        /* Scrollbar suave */
+        .modal-content::-webkit-scrollbar, .flip-card-back::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb, .flip-card-back::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="instruction">haga clic sobre las tarjetas para ampliar la información</div>
+
+    <div class="main-container">
+        <div class="card-container">
+            <div class="card" onclick="openModal('modal1')">
+                <div class="card-bg-img"
+                    style="background-image: url('https://images.unsplash.com/photo-1544383835-bda2bc66a55d?auto=format&fit=crop&q=80&w=800');">
+                </div>
+                <h2>Conocimientos Previos</h2>
+            </div>
+
+            <div class="card" onclick="openModal('modal2')">
+                <div class="card-bg-img"
+                    style="background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800');">
+                </div>
+                <h2>Resultados de aprendizaje</h2>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <div class="close-btn" onclick="closeModal('modal1')">✕</div>
+            <h3>Conocimientos Previos</h3>
+            <p style="margin-bottom: 25px; font-size: 0.95rem; opacity: 0.8;">Para abordar con solvencia los contenidos del Módulo 1, se recomienda que el estudiante cuente con los siguientes conocimientos y competencias previas (Haz clic en cada tarjeta para girarla):</p>
+            
+            <div class="grid-knowledge">
+                
+                <div class="flip-card" onclick="toggleFlip(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h4>Fundamentos de bases de datos</h4>
+                            <div class="click-hint">Girar ↻</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Comprensión básica de cómo se estructuran y almacenan los datos en sistemas de información, incluyendo conceptos como tablas, registros, atributos y relaciones entre datos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" onclick="toggleFlip(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h4>Manejo básico de consultas SQL</h4>
+                            <div class="click-hint">Girar ↻</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Capacidad para realizar consultas simples en bases de datos relacionales utilizando instrucciones SELECT, filtros básicos y consultas para recuperar información.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" onclick="toggleFlip(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h4>Conceptos básicos de sistemas de información</h4>
+                            <div class="click-hint">Girar ↻</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Comprensión general de cómo las organizaciones utilizan sistemas tecnológicos para almacenar, procesar y gestionar información en diferentes áreas del negocio.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" onclick="toggleFlip(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h4>Interpretación de datos y reportes</h4>
+                            <div class="click-hint">Girar ↻</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Habilidad para comprender información presentada en tablas, gráficos o reportes, identificando patrones básicos o tendencias dentro de los datos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" onclick="toggleFlip(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h4>Uso básico de herramientas informáticas</h4>
+                            <div class="click-hint">Girar ↻</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Experiencia en el uso de aplicaciones de oficina o herramientas de análisis de datos (por ejemplo, hojas de cálculo), que faciliten la manipulación y exploración de información.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flip-card" onclick="toggleFlip(this)">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <h4>Interés por el análisis de información y la toma de decisiones</h4>
+                            <div class="click-hint">Girar ↻</div>
+                        </div>
+                        <div class="flip-card-back">
+                            <p>Disposición para comprender cómo los datos pueden utilizarse para analizar el comportamiento de una organización y apoyar la toma de decisiones basada en información.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="modal2" class="modal">
+        <div class="modal-content">
+            <div class="close-btn" onclick="closeModal('modal2')">✕</div>
+            <h3>Resultados de aprendizaje</h3>
+            <p style="margin-bottom: 25px; font-size: 0.95rem; opacity: 0.8;">Al finalizar esta unidad, el estudiante estará en capacidad de:</p>
+            
+            <div class="learning-outcomes">
+                
+                <div class="outcome-item">
+                    <div class="outcome-num">01</div>
+                    <h4 class="outcome-title">Comprender los fundamentos de la Inteligencia de Negocios</h4>
+                    <p class="outcome-desc">Analizar los conceptos esenciales de Business Intelligence, su evolución dentro de los sistemas de información y su importancia en la transformación de datos en información útil para apoyar la toma de decisiones organizacionales.</p>
+                </div>
+
+                <div class="outcome-item">
+                    <div class="outcome-num">02</div>
+                    <h4 class="outcome-title">Identificar los componentes de una arquitectura de Business Intelligence</h4>
+                    <p class="outcome-desc">Reconocer los elementos que conforman una solución de BI, incluyendo fuentes de datos, procesos ETL, Data Warehouses, Data Marts y herramientas analíticas utilizadas para el procesamiento y análisis de información.</p>
+                </div>
+
+                <div class="outcome-item">
+                    <div class="outcome-num">03</div>
+                    <h4 class="outcome-title">Comprender los modelos de almacenamiento de datos para análisis</h4>
+                    <p class="outcome-desc">Distinguir las características de los Data Warehouses, Data Marts y modelos dimensionales, comprendiendo su papel dentro de las arquitecturas de datos utilizadas en proyectos de Inteligencia de Negocios.</p>
+                </div>
+
+                <div class="outcome-item">
+                    <div class="outcome-num">04</div>
+                    <h4 class="outcome-title">Analizar el proceso de integración y transformación de datos</h4>
+                    <p class="outcome-desc">Comprender las fases del proceso ETL (Extract, Transform, Load), identificando cómo los datos provenientes de múltiples fuentes pueden integrarse, limpiarse y transformarse para su análisis en sistemas de BI.</p>
+                </div>
+
+                <div class="outcome-item">
+                    <div class="outcome-num">05</div>
+                    <h4 class="outcome-title">Reconocer la importancia de la calidad y gobernanza de datos</h4>
+                    <p class="outcome-desc">Evaluar la relevancia de la calidad de los datos y de los procesos de gobernanza de datos dentro de los proyectos de Inteligencia de Negocios, entendiendo su impacto en la confiabilidad de la información utilizada para la toma de decisiones.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            document.body.style.overflow = 'auto';
+            // Al cerrar el modal, reiniciamos el estado de giro de todas las flip cards
+            const flippedCards = document.querySelectorAll('.flip-card.flipped');
+            flippedCards.forEach(card => card.classList.remove('flipped'));
+        }
+
+        function toggleFlip(card) {
+            card.classList.toggle('flipped');
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === "Escape") {
+                const activeModal = document.querySelector('.modal.active');
+                if (activeModal) closeModal(activeModal.id);
+            }
+        });
+
+        window.onclick = function (e) {
+            if (e.target.classList.contains('modal')) {
+                closeModal(e.target.id);
+            }
+        }
+    </script>
+
+</body>
+
+</html>
