@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Componentes de Business Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #51389a; /* Color morado de la imagen original */
+            --bg-light: #f2eeff;       /* Fondo alterno morado muy claro */
+            --bg-white: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e1dbee;   /* Borde en tono lavanda suave */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f7f6fb;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .table-container {
+            width: 100%;
+            max-width: 1100px;
+            box-shadow: 0 12px 40px rgba(81, 56, 154, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--bg-white);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 18px 22px;
+            font-size: 14px;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            line-height: 1.6;
+            vertical-align: middle;
+        }
+
+        /* --- CONTROL DE PROPORCIONES DE COLUMNAS (2 Columnas) --- */
+        th:nth-child(1), td:nth-child(1) { width: 30%; text-align: left; padding-left: 24px; }
+        th:nth-child(2), td:nth-child(2) { width: 70%; text-align: left; padding-left: 24px; }
+
+        /* Resalte para la columna de Componentes */
+        tbody td:nth-child(1) {
+            font-weight: 500;
+            color: #111111;
+        }
+
+        /* --- ENCABEZADOS --- */
+        thead th {
+            background-color: var(--primary-color);
+            color: var(--bg-white) !important;
+            font-weight: 600;
+            font-size: 14.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 20px 24px;
+            animation: slideDown 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        /* Alternancia de color en las filas (Zebra Striping) */
+        tbody tr:nth-child(even) td {
+            background-color: var(--bg-light);
+        }
+        tbody tr:nth-child(odd) td {
+            background-color: var(--bg-white);
+        }
+
+        /* --- ANIMACIONES EN CASCADA --- */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        tbody tr {
+            opacity: 0;
+            animation: fadeInUp 0.45s ease forwards;
+        }
+
+        /* Retrasos para las 4 filas */
+        tbody tr:nth-child(1) { animation-delay: 0.05s; }
+        tbody tr:nth-child(2) { animation-delay: 0.12s; }
+        tbody tr:nth-child(3) { animation-delay: 0.19s; }
+        tbody tr:nth-child(4) { animation-delay: 0.26s; }
+
+        /* Efecto Hover interactivo */
+        tbody tr:hover td {
+            background-color: rgba(81, 56, 154, 0.06) !important;
+            transition: background-color 0.15s ease;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Componente</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Integración de datos</td>
+                    <td>Procesos que permiten extraer, transformar y consolidar información proveniente de múltiples sistemas empresariales.</td>
+                </tr>
+                <tr>
+                    <td>Almacenamiento analítico</td>
+                    <td>Repositorios especializados como Data Warehouse o Data Mart que almacenan información histórica para análisis.</td>
+                </tr>
+                <tr>
+                    <td>Herramientas analíticas</td>
+                    <td>Plataformas que permiten explorar los datos mediante análisis multidimensional, minería de datos o análisis estadístico.</td>
+                </tr>
+                <tr>
+                    <td>Visualización de datos</td>
+                    <td>Sistemas de reportes y paneles de control que facilitan la interpretación de la información.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
