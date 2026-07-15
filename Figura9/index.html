@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Estrella Perfecto y Adaptable</title>
+    <style>
+        /* Estilos Generales */
+        :root {
+            --bg-color: #0b0f19;         /* Fondo azul muy oscuro idéntico a la imagen */
+            --header-dim: #9aa0a6;       /* Encabezado gris de dimensiones */
+            --header-fact: #111236;      /* Encabezado azul oscuro de hechos */
+            --card-bg: #ffffff;          /* Fondo blanco de las tarjetas */
+            --text-dark: #1f2937;        /* Texto de las columnas */
+            --highlight-color: #f58220;  /* Naranja para PK, FK y Métrica */
+            --line-color: #5c6479;       /* Color de las líneas conectoras */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Contenedor Principal (Flujo Vertical) */
+        .diagram-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* Fila de en medio (Cliente - Línea - Hechos - Línea - Producto) */
+        .middle-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Estructura de las Tarjetas */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            width: 190px; 
+            flex-shrink: 0; /* Evita que las tarjetas se deformen */
+            opacity: 0; /* Ocultas para la animación */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-fact {
+            width: 230px; /* La de hechos es ligeramente más ancha */
+        }
+
+        .card:hover {
+            transform: scale(1.04) !important;
+            box-shadow: 0 15px 30px rgba(92, 100, 121, 0.4);
+        }
+
+        /* Cabeceras */
+        .card-header {
+            padding: 10px 15px;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 1.05rem;
+            text-align: center;
+        }
+
+        .card-dim .card-header {
+            background-color: var(--header-dim);
+        }
+
+        .card-fact .card-header {
+            background-color: var(--header-fact);
+            font-size: 1.15rem;
+        }
+
+        /* Cuerpo */
+        .card-body {
+            padding: 12px 18px;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Resaltado de llaves y métricas */
+        .hl {
+            color: var(--highlight-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 32px;
+        }
+        
+        .hl-long {
+            width: 65px;
+        }
+
+        /* ==========================================================
+           CONECTORES FLUIDOS (Se adaptan automáticamente)
+           ========================================================== */
+        
+        /* Conectores Horizontales (Laterales) */
+        .horizontal-connector {
+            height: 2px;
+            background-color: var(--line-color);
+            flex-grow: 1; /* Esto hace que la línea tome TODO el espacio disponible entre tarjetas */
+            max-width: 80px; /* Límite para que no se separen demasiado en pantallas enormes */
+            min-width: 20px; /* Mínimo espacio garantizado */
+            transform: scaleX(0);
+            opacity: 0;
+        }
+
+        .conn-left {
+            transform-origin: right; /* Crece desde el centro hacia la izquierda */
+        }
+
+        .conn-right {
+            transform-origin: left; /* Crece desde el centro hacia la derecha */
+        }
+
+        /* Conectores Verticales (Arriba y Abajo) */
+        .vertical-connector {
+            width: 2px;
+            height: 40px; /* Longitud del conector vertical */
+            background-color: var(--line-color);
+            transform: scaleY(0);
+            opacity: 0;
+        }
+
+        .conn-top {
+            transform-origin: bottom; /* Crece desde el centro hacia arriba */
+        }
+
+        .conn-bottom {
+            transform-origin: top; /* Crece desde el centro hacia abajo */
+        }
+
+        /* Subtexto explicativo final */
+        .subtext {
+            color: var(--header-dim);
+            font-size: 0.95rem;
+            margin-top: 25px;
+            font-style: italic;
+            opacity: 0;
+        }
+
+        /* ==========================================================
+           ANIMACIONES SECUENCIALES (De adentro hacia afuera)
+           ========================================================== */
+
+        /* 1. Aparece Fact_Ventas (Centro) */
+        .anim-center {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 0.2s;
+        }
+
+        /* 2. Las 4 líneas crecen desde el centro simultáneamente */
+        .conn-top {
+            animation: drawVertical 0.5s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+        .conn-bottom {
+            animation: drawVertical 0.5s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+        .conn-left {
+            animation: drawHorizontal 0.5s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+        .conn-right {
+            animation: drawHorizontal 0.5s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+
+        /* 3. Las 4 tablas de dimensiones aparecen al final de las líneas */
+        .anim-top {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 1.3s;
+        }
+        .anim-bottom {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 1.3s;
+        }
+        .anim-left {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 1.3s;
+        }
+        .anim-right {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 1.3s;
+        }
+
+        /* 4. Subtexto final */
+        .anim-subtext {
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 1.8s;
+        }
+
+        /* Keyframes */
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes drawHorizontal {
+            to {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes drawVertical {
+            to {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 0.7;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="diagram-container">
+        
+        <div class="card card-dim anim-top">
+            <div class="card-header">Dim_Tiempo</div>
+            <div class="card-body">
+                <div>D_Tiempo</div>
+                <div>Año</div>
+                <div>Mes</div>
+                <div>Día</div>
+                <div>Día_de_la_Semana</div>
+            </div>
+        </div>
+
+        <div class="vertical-connector conn-top"></div>
+
+        <div class="middle-row">
+            <div class="card card-dim anim-left">
+                <div class="card-header">Dim_Cliente</div>
+                <div class="card-body">
+                    <div>ID_Cliente</div>
+                    <div>Nombre</div>
+                    <div>Dirección</div>
+                    <div>Segmento</div>
+                </div>
+            </div>
+
+            <div class="horizontal-connector conn-left"></div>
+
+            <div class="card card-fact anim-center">
+                <div class="card-header">Fact_Ventas</div>
+                <div class="card-body">
+                    <div><span class="hl">PK:</span>ID_Venta</div>
+                    <div><span class="hl">FK:</span>ID_Tiempo</div>
+                    <div><span class="hl">FK:</span>ID_Cliente</div>
+                    <div><span class="hl">FK:</span>ID_Producto</div>
+                    <div><span class="hl">FK:</span>ID_Sucursal</div>
+                    <div><span class="hl hl-long">Métrica:</span>Total_Ventas</div>
+                </div>
+            </div>
+
+            <div class="horizontal-connector conn-right"></div>
+
+            <div class="card card-dim anim-right">
+                <div class="card-header">Dim_Producto</div>
+                <div class="card-body">
+                    <div>ID_Producto</div>
+                    <div>Nombre_Producto</div>
+                    <div>Categoría</div>
+                    <div>Marca</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vertical-connector conn-bottom"></div>
+
+        <div class="card card-dim anim-bottom">
+            <div class="card-header">Dim_Sucursal</div>
+            <div class="card-body">
+                <div>ID_Sucursal</div>
+                <div>Nombre_Sucursal</div>
+                <div>Ciudad</div>
+                <div>Gerente</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
