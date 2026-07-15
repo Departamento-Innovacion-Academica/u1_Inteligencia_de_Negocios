@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procesos ETL - Tech Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-purple: #9d4edd;
+            --dark-bg: #0a0118;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --neon-border: rgba(157, 78, 221, 0.3);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-bg);
+            background-image:
+                radial-gradient(circle at 80% 20%, rgba(157, 78, 221, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(60, 9, 108, 0.2) 0%, transparent 50%);
+            color: #e0e1dd;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        /* Contenedor Unificado (Integra el contenido y la navegación lado a lado) */
+        .unified-container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            background: var(--glass-bg);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        /* Área de Contenido de la izquierda */
+        .content-section {
+            padding: 50px;
+            padding-bottom: 80px; /* Espacio extra abajo para evitar colisión con el texto flotante */
+            height: 600px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Instrucción flotante */
+        .floating-instruction {
+            position: absolute;
+            bottom: 25px;
+            left: 50px;
+            font-size: 0.85rem;
+            color: #c77dff;
+            background: rgba(157, 78, 221, 0.15);
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.15);
+            animation: pulse-glow 2s infinite ease-in-out;
+            z-index: 10;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.9;
+                box-shadow: 0 4px 15px rgba(157, 78, 221, 0.15);
+            }
+            50% {
+                transform: scale(1.02);
+                opacity: 1;
+                box-shadow: 0 4px 25px rgba(157, 78, 221, 0.35);
+            }
+        }
+
+        /* Barra de navegación de la derecha */
+        .navigation-aside {
+            background: rgba(10, 1, 24, 0.5);
+            border-left: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 40px 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* Estilos de las tarjetas de contenido */
+        .content-card {
+            display: none;
+            animation: fadeInBlur 0.5s ease-out forwards;
+        }
+
+        .content-card.active {
+            display: block;
+        }
+
+        @keyframes fadeInBlur {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+                filter: blur(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+
+        /* Botones de navegación con borde de neón */
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: #b0a6c0;
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-purple);
+            color: #fff;
+            background: rgba(157, 78, 221, 0.1);
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.25);
+            transform: translateX(-5px);
+        }
+
+        .nav-btn.active {
+            background: rgba(157, 78, 221, 0.2);
+            border-color: #c77dff;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.35);
+            transform: translateX(-8px);
+        }
+
+        /* Pequeño indicador LED a la izquierda del botón activo */
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: #c77dff;
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-btn.active::before {
+            transform: scaleY(1);
+        }
+
+        /* Etiquetas del contenido */
+        .tech-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #5a189a;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #fff, #c77dff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        p,
+        li {
+            line-height: 1.6;
+            font-size: 1.05rem;
+            color: #b0a6c0;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 20px;
+            margin-top: 15px;
+        }
+
+        li {
+            position: relative;
+            padding-left: 25px;
+        }
+
+        li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--primary-purple);
+            font-weight: bold;
+        }
+
+        /* Scrollbar personalizado con estilo cyberpunk */
+        .content-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content-section::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .content-section::-webkit-scrollbar-thumb {
+            background: rgba(157, 78, 221, 0.3);
+            border-radius: 10px;
+        }
+
+        .content-section::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-purple);
+        }
+
+        .bg-ornament {
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            border: 2px solid var(--primary-purple);
+            border-radius: 50%;
+            opacity: 0.03;
+            bottom: -80px;
+            left: -80px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="unified-container">
+        <div class="bg-ornament"></div>
+
+        <main class="content-section">
+            
+            <div class="floating-instruction">
+                <span class="flex h-2 w-2 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+                </span>
+                haga clic sobre los botones de la derecha para ampliar la información.
+            </div>
+
+            <div id="card-0" class="content-card active">
+                <span class="tech-tag">Fase 1</span>
+                <h2>Fase de extracción (Extract)</h2>
+                <p>La extracción consiste en obtener datos desde diversas fuentes, las cuales pueden incluir bases de datos relacionales, sistemas ERP, APIs, archivos planos o incluso logs de aplicaciones.</p>
+                <p>En esta etapa, el objetivo principal es recuperar los datos sin afectar el rendimiento de los sistemas origen. Para ello, se suelen utilizar técnicas como:</p>
+                <ul>
+                    <li>Extracción incremental.</li>
+                    <li>Extracción completa.</li>
+                    <li>Replicación de datos.</li>
+                </ul>
+                <p>La elección de la técnica depende del volumen de datos y de la frecuencia de actualización requerida.</p>
+            </div>
+
+            <div id="card-1" class="content-card">
+                <span class="tech-tag">Fase 2</span>
+                <h2>Fase de transformación (Transform)</h2>
+                <p>Una vez extraídos, los datos deben ser transformados para adaptarse a las necesidades del análisis. Esta fase es una de las más críticas, ya que en ella se asegura la calidad y consistencia de la información.</p>
+                <p>Las transformaciones pueden incluir:</p>
+                <ul>
+                    <li>Limpieza de datos (eliminación de valores nulos o inconsistentes).</li>
+                    <li>Estandarización de formatos.</li>
+                    <li>Integración de múltiples fuentes.</li>
+                    <li>Validación de reglas de negocio.</li>
+                    <li>Enriquecimiento de datos.</li>
+                </ul>
+                <p>Este proceso permite convertir datos crudos en información estructurada y confiable para su análisis (Sharda, Delen, & Turban, 2018).</p>
+            </div>
+
+            <div id="card-2" class="content-card">
+                <span class="tech-tag">Fase 3</span>
+                <h2>Fase de carga (Load)</h2>
+                <p>La fase de carga consiste en almacenar los datos transformados en el repositorio final, como un Data Warehouse o Data Mart. Dependiendo de los requerimientos del sistema, la carga puede realizarse de diferentes formas:</p>
+                <ul>
+                    <li>Carga completa.</li>
+                    <li>Carga incremental.</li>
+                    <li>Carga en tiempo real.</li>
+                </ul>
+                <p>La estrategia de carga influye en el rendimiento del sistema y en la disponibilidad de la información para los usuarios.</p>
+            </div>
+
+            <div id="card-3" class="content-card">
+                <span class="tech-tag">Tecnologías</span>
+                <h2>Herramientas ETL en el mercado</h2>
+                <p>En la práctica, los procesos ETL suelen implementarse mediante herramientas especializadas que automatizan las tareas de integración de datos. Estas herramientas permiten diseñar flujos de datos, aplicar transformaciones y programar procesos de carga.</p>
+                <p>Algunas de las herramientas más utilizadas incluyen:</p>
+                <ul>
+                    <li>Informatica PowerCenter.</li>
+                    <li>Talend Data Integration.</li>
+                    <li>Microsoft SQL Server Integration Services (SSIS).</li>
+                    <li>Apache NiFi.</li>
+                </ul>
+                <p>Estas plataformas facilitan la gestión de grandes volúmenes de datos y permiten reducir la complejidad de los procesos ETL.</p>
+            </div>
+        </main>
+
+        <aside class="navigation-aside">
+            <button class="nav-btn active" onclick="showTab(0)">Fase de extracción (Extract)</button>
+            <button class="nav-btn" onclick="showTab(1)">Fase de transformación (Transform)</button>
+            <button class="nav-btn" onclick="showTab(2)">Fase de carga (Load)</button>
+            <button class="nav-btn" onclick="showTab(3)">Herramientas ETL en el mercado</button>
+        </aside>
+    </div>
+
+    <script>
+        function showTab(index) {
+            // Actualizar botones activos
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            buttons[index].classList.add('active');
+
+            // Actualizar contenido activo
+            const cards = document.querySelectorAll('.content-card');
+            cards.forEach(card => card.classList.remove('active'));
+
+            // Reiniciar animación del contenido seleccionado
+            setTimeout(() => {
+                cards[index].classList.add('active');
+            }, 10);
+        }
+    </script>
+</body>
+
+</html>
