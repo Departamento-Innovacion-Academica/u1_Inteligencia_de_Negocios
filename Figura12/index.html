@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline de Datos - Flujo Animado</title>
+    <style>
+        /* Estilos Generales */
+        :root {
+            --bg-color: #0b0f19;         /* Fondo oscuro premium */
+            --card-bg: #070a13;          /* Fondo de tarjeta ultra oscuro */
+            --border-color: #1e293b;     /* Borde elegante de tarjetas */
+            --text-primary: #ffffff;     /* Texto principal */
+            --text-secondary: #94a3b8;   /* Texto secundario / Explicativo */
+            --line-color: #4f5769;       /* Color de la línea de flujo */
+            --icon-color: #38bdf8;       /* Color celeste brillante para los iconos */
+            --card-width: 480px;         /* Ancho de tarjeta optimizado */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: var(--text-primary);
+        }
+
+        /* Contenedor Principal del Diagrama */
+        .pipeline-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: var(--card-width);
+        }
+
+        /* Título Principal */
+        .main-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            text-align: center;
+            letter-spacing: -0.025em;
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        /* Estructura de Bloque / Tarjeta */
+        .flow-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            width: 100%;
+            padding: 22px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* Efecto Hover Inteligente */
+        .flow-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--icon-color);
+            box-shadow: 0 15px 35px rgba(56, 189, 248, 0.15);
+        }
+
+        /* Información del Texto */
+        .card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .card-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Contenedor de Iconos SVG */
+        .card-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: 20px;
+            flex-shrink: 0;
+        }
+
+        .card-icons svg {
+            width: 38px;
+            height: 38px;
+            fill: none;
+            stroke: var(--icon-color);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.25s ease, transform 0.25s ease;
+        }
+
+        .flow-card:hover .card-icons svg {
+            transform: scale(1.1);
+        }
+
+        /* Flechas de Conexión */
+        .flow-arrow {
+            width: 2px;
+            height: 30px;
+            background: linear-gradient(to bottom, var(--line-color), var(--icon-color));
+            position: relative;
+            opacity: 0;
+            transform: scaleY(0);
+            transform-origin: top;
+        }
+
+        /* Punta de la flecha */
+        .flow-arrow::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 6px solid var(--icon-color);
+        }
+
+        /* ==========================================================
+           SECUENCIA DE ANIMACIONES
+           ========================================================== */
+
+        /* Pasos de aparición de tarjetas */
+        .anim-card-1 {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 0.2s;
+        }
+        .anim-card-2 {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 1.0s;
+        }
+        .anim-card-3 {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 1.8s;
+        }
+        .anim-card-4 {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 2.6s;
+        }
+
+        /* Pasos de estiramiento de flechas */
+        .anim-arrow-1 {
+            animation: drawArrow 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 0.75s;
+        }
+        .anim-arrow-2 {
+            animation: drawArrow 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 1.55s;
+        }
+        .anim-arrow-3 {
+            animation: drawArrow 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 2.35s;
+        }
+
+        /* Keyframes */
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes drawArrow {
+            to {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pipeline-container">
+        
+        <h1 class="main-title">Fuentes de datos</h1>
+
+        <div class="flow-card anim-card-1">
+            <div class="card-info">
+                <div class="card-title">(BD, APIs, Sensores, logs)</div>
+            </div>
+            <div class="card-icons">
+                <svg viewBox="0 0 24 24">
+                    <rect x="2" y="2" width="20" height="8" rx="2" />
+                    <rect x="2" y="14" width="20" height="8" rx="2" />
+                    <line x1="6" y1="6" x2="6" y2="6" stroke-width="2" />
+                    <line x1="6" y1="18" x2="6" y2="18" stroke-width="2" />
+                </svg>
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="5" r="3" />
+                    <circle cx="5" cy="19" r="3" />
+                    <circle cx="19" cy="19" r="3" />
+                    <line x1="12" y1="8" x2="19" y2="16" />
+                    <line x1="12" y1="8" x2="5" y2="16" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="flow-arrow anim-arrow-1"></div>
+
+        <div class="flow-card anim-card-2">
+            <div class="card-info">
+                <div class="card-title">Ingesta de datos</div>
+            </div>
+            <div class="card-icons">
+                <svg viewBox="0 0 24 24">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="flow-arrow anim-arrow-2"></div>
+
+        <div class="flow-card anim-card-3">
+            <div class="card-info">
+                <div class="card-title">Data lake</div>
+                <div class="card-subtitle">(Datos en bruto)</div>
+            </div>
+            <div class="card-icons">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12V5H2V12C2 17.5228 6.47715 22 12 22Z" />
+                    <path d="M2 8H22" />
+                    <circle cx="7" cy="13" r="1.5" stroke-width="1" />
+                    <circle cx="12" cy="15" r="1.5" stroke-width="1" />
+                    <circle cx="17" cy="12" r="1.5" stroke-width="1" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="flow-arrow anim-arrow-3"></div>
+
+        <div class="flow-card anim-card-4">
+            <div class="card-info">
+                <div class="card-title">Procesamiento y análisis</div>
+                <div class="card-subtitle">(Big Data / ML)</div>
+            </div>
+            <div class="card-icons">
+                <svg viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="16" height="16" rx="2" />
+                    <rect x="9" y="9" width="6" height="6" />
+                    <line x1="9" y1="1" x2="9" y2="4" />
+                    <line x1="15" y1="1" x2="15" y2="4" />
+                    <line x1="9" y1="20" x2="9" y2="23" />
+                    <line x1="15" y1="20" x2="15" y2="23" />
+                    <line x1="20" y1="9" x2="23" y2="9" />
+                    <line x1="20" y1="15" x2="23" y2="15" />
+                    <line x1="1" y1="9" x2="4" y2="9" />
+                    <line x1="1" y1="15" x2="4" y2="15" />
+                </svg>
+                <svg viewBox="0 0 24 24">
+                    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 2.5 2.5 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2z" />
+                    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 2.5 2.5 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z" />
+                </svg>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
