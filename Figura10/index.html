@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo Copo de Nieve - Ultra Centrado y Pulido</title>
+    <style>
+        /* Estilos Generales */
+        :root {
+            --bg-color: #0b0f19;         /* Fondo oscuro premium */
+            --header-dim: #9aa0a6;       /* Gris elegante de dimensiones */
+            --header-fact: #111236;      /* Azul profundo de hechos */
+            --card-bg: #ffffff;          /* Blanco puro para el cuerpo */
+            --text-dark: #1f2937;        /* Texto de los campos */
+            --line-color: #4f5769;       /* Líneas de conexión más definidas */
+            --card-width: 180px;         /* Ancho uniforme */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Contenedor de escenario general */
+        .diagram-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            max-width: 1300px;
+        }
+
+        /* Núcleo Central (Columna central fija) */
+        .center-nucleus {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+        }
+
+        /* Bloque central de Hechos */
+        .card-fact {
+            background-color: var(--header-fact);
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 16px 32px;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 190px;
+            flex-shrink: 0;
+            opacity: 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Tarjetas de Dimensión estándar */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            width: var(--card-width);
+            flex-shrink: 0;
+            opacity: 0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card-simple {
+            height: auto;
+        }
+
+        .card-simple .card-header {
+            border-radius: 14px;
+        }
+
+        .card-header {
+            background-color: var(--header-dim);
+            padding: 12px 15px;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 1.05rem;
+            text-align: center;
+        }
+
+        .card-body {
+            padding: 12px 18px;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* Animación Hover */
+        .card-fact:hover, .card:hover {
+            transform: scale(1.04) !important;
+            box-shadow: 0 12px 25px rgba(92, 100, 121, 0.4);
+        }
+
+        /* ==========================================================
+           POSICIONAMIENTO ABSOLUTO (Ramas Laterales Estables)
+           ========================================================== */
+
+        /* Rama Izquierda (Dim_Cliente) */
+        .branch-left {
+            position: absolute;
+            right: calc(50% + 95px); /* Justo al borde de la tabla de hechos */
+            display: flex;
+            align-items: center;
+        }
+
+        /* Rama Derecha (Dim_Producto -> Dim_Categoría) */
+        .branch-right {
+            position: absolute;
+            left: calc(50% + 95px); /* Justo al borde de la tabla de hechos */
+            display: flex;
+            align-items: center;
+        }
+
+        .branch-top {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .branch-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ==========================================================
+           CONECTORES DE LÍNEAS (Más holgura para las etiquetas)
+           ========================================================== */
+        
+        /* Conector Horizontal */
+        .horizontal-connector {
+            height: 2px;
+            background-color: var(--line-color);
+            width: 80px; /* Aumentado de 60px a 80px para dar más aire */
+            flex-shrink: 0;
+            position: relative;
+            transform: scaleX(0);
+            opacity: 0;
+        }
+
+        /* Conector Vertical */
+        .vertical-connector {
+            width: 2px;
+            height: 45px; /* Aumentado de 35px a 45px para dar más aire */
+            background-color: var(--line-color);
+            flex-shrink: 0;
+            position: relative;
+            transform: scaleY(0);
+            opacity: 0;
+        }
+
+        /* Etiquetas de Cardinalidad (1 y *) */
+        .cardinality {
+            position: absolute;
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-family: monospace;
+            font-weight: bold;
+            opacity: 0;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        /* Colocación de etiquetas sin pisar la línea */
+        .horizontal-connector .cardinality-left { left: 8px; bottom: 6px; }
+        .horizontal-connector .cardinality-right { right: 8px; bottom: 6px; }
+
+        .vertical-connector .cardinality-top { left: 8px; top: 4px; }
+        .vertical-connector .cardinality-bottom { left: 8px; bottom: 4px; }
+
+        /* Orígenes de crecimiento */
+        .conn-grow-x-right { transform-origin: left; }
+        .conn-grow-x-left { transform-origin: right; }
+        .conn-grow-y-top { transform-origin: bottom; }
+        .conn-grow-y-bottom { transform-origin: top; }
+
+        /* ==========================================================
+           SECUENCIA DE ANIMACIONES
+           ========================================================== */
+
+        /* Paso 1: Bloque de Hechos (Centro) */
+        .anim-step-1 {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 0.2s;
+        }
+
+        /* Paso 2: Conectores inmediatos */
+        .anim-line-inner-v-up {
+            animation: drawVertical 0.5s ease-out forwards;
+            animation-delay: 0.7s;
+        }
+        .anim-line-inner-v-down {
+            animation: drawVertical 0.5s ease-out forwards;
+            animation-delay: 0.7s;
+        }
+        .anim-line-inner-h-left {
+            animation: drawHorizontal 0.5s ease-out forwards;
+            animation-delay: 0.7s;
+        }
+        .anim-line-inner-h-right {
+            animation: drawHorizontal 0.5s ease-out forwards;
+            animation-delay: 0.7s;
+        }
+
+        /* Paso 3: Primer nivel de dimensiones */
+        .anim-step-2 {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 1.1s;
+        }
+
+        /* Paso 4: Conectores exteriores */
+        .anim-line-outer-v-up {
+            animation: drawVertical 0.5s ease-out forwards;
+            animation-delay: 1.6s;
+        }
+        .anim-line-outer-h-right {
+            animation: drawHorizontal 0.5s ease-out forwards;
+            animation-delay: 1.6s;
+        }
+
+        /* Paso 5: Nivel exterior (Año y Categoría) */
+        .anim-step-3 {
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: 2.0s;
+        }
+
+        /* Retardo de textos de cardinalidad */
+        .anim-line-inner-v-up .cardinality { animation-delay: 1.0s; }
+        .anim-line-inner-v-down .cardinality { animation-delay: 1.0s; }
+        .anim-line-inner-h-left .cardinality { animation-delay: 1.0s; }
+        .anim-line-inner-h-right .cardinality { animation-delay: 1.0s; }
+        
+        .anim-line-outer-v-up .cardinality { animation-delay: 1.9s; }
+        .anim-line-outer-h-right .cardinality { animation-delay: 1.9s; }
+
+        /* Keyframes */
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes drawHorizontal {
+            to {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes drawVertical {
+            to {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="diagram-wrapper">
+        
+        <!-- RAMA IZQUIERDA: Dim_Cliente -->
+        <div class="branch-left">
+            <div class="card anim-step-2">
+                <div class="card-header">Dim_Cliente</div>
+                <div class="card-body">
+                    <div>ID_Cliente</div>
+                    <div>Nombre</div>
+                    <div>Dirección</div>
+                    <div>Segmento</div>
+                </div>
+            </div>
+            <!-- Conector Izquierdo -->
+            <div class="horizontal-connector conn-grow-x-left anim-line-inner-h-left">
+                <span class="cardinality cardinality-left">1</span>
+                <span class="cardinality cardinality-right">*</span>
+            </div>
+        </div>
+
+
+        <!-- COLUMNA VERTICAL CENTRAL (Sostiene el eje del Universo) -->
+        <div class="center-nucleus">
+            
+            <!-- Rama Superior: Dim_Año & Dim_Tiempo -->
+            <div class="branch-top">
+                <div class="card card-simple anim-step-3">
+                    <div class="card-header">Dim_Año</div>
+                </div>
+                <div class="vertical-connector conn-grow-y-top anim-line-outer-v-up">
+                    <span class="cardinality cardinality-top">1</span>
+                    <span class="cardinality cardinality-bottom">1</span>
+                </div>
+                <div class="card card-simple anim-step-2">
+                    <div class="card-header">Dim_Tiempo</div>
+                </div>
+            </div>
+
+            <!-- Conector Central Superior -->
+            <div class="vertical-connector conn-grow-y-top anim-line-inner-v-up">
+                <span class="cardinality cardinality-top">1</span>
+                <span class="cardinality cardinality-bottom">*</span>
+            </div>
+
+            <!-- TABLA DE HECHOS: Fact_Ventas (Centro Absoluto) -->
+            <div class="card-fact anim-step-1">Fact_Ventas</div>
+
+            <!-- Conector Central Inferior -->
+            <div class="vertical-connector conn-grow-y-bottom anim-line-inner-v-down">
+                <span class="cardinality cardinality-top">*</span>
+                <span class="cardinality cardinality-bottom">1</span>
+            </div>
+
+            <!-- Rama Inferior: Dim_Sucursal -->
+            <div class="branch-bottom">
+                <div class="card card-simple anim-step-2">
+                    <div class="card-header">Dim_Sucursal</div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- RAMA DERECHA: Dim_Producto -> Dim_Categoría -->
+        <div class="branch-right">
+            <!-- Conector Central Derecho -->
+            <div class="horizontal-connector conn-grow-x-right anim-line-inner-h-right">
+                <span class="cardinality cardinality-left">*</span>
+                <span class="cardinality cardinality-right">1</span>
+            </div>
+            <!-- Dim_Producto -->
+            <div class="card anim-step-2">
+                <div class="card-header">Dim_Producto</div>
+                <div class="card-body">
+                    <div>ID_Producto</div>
+                </div>
+            </div>
+            <!-- Conector Externo Derecho -->
+            <div class="horizontal-connector conn-grow-x-right anim-line-outer-h-right">
+                <span class="cardinality cardinality-left">1</span>
+                <span class="cardinality cardinality-right">1</span>
+            </div>
+            <!-- Dim_Categoría -->
+            <div class="card anim-step-3">
+                <div class="card-header">Dim_Categoría</div>
+                <div class="card-body">
+                    <div>Dim_Categoría</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
