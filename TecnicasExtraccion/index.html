@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extracción de Datos - BI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #e0e8f6;
+            --text-color: #2c3e50;
+            --text-secondary: #5a6e85;
+            --card-shadow-out: 9px 9px 16px #be9d9d00, -9px -9px 16px #ffffff00; /* Fallback dinámico */
+            --neumorphic-flat: 8px 8px 16px #b8c4d9, -8px -8px 16px #ffffff;
+            --neumorphic-inset: inset 2px 2px 5px #b8c4d9, inset -2px -2px 5px #ffffff;
+            --apple-blue: #0071e3;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            justify-items: center;
+        }
+
+        /* --- Tarjeta Esqueuomórfica --- */
+        .card {
+            background: var(--bg-color);
+            border-radius: 30px;
+            padding: 30px;
+            width: 100%;
+            max-width: 340px;
+            height: 380px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: var(--neumorphic-flat);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 12px 12px 24px #b0bcd4, -12px -12px 24px #ffffff;
+        }
+
+        .card:active {
+            transform: scale(0.97);
+            box-shadow: var(--neumorphic-inset);
+        }
+
+        /* Icono / Indicador Esqueuomórfico superior */
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: var(--bg-color);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: var(--neumorphic-flat);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            box-shadow: var(--neumorphic-inset);
+        }
+
+        .card-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--apple-blue);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Botón estilo iOS */
+        .card-btn {
+            background-color: var(--apple-blue);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3);
+        }
+
+        .card-btn:hover {
+            background-color: #0077ed;
+            box-shadow: 0 6px 20px rgba(0, 113, 227, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* --- Ventana Emergente Estilo Apple (Modal) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            width: 90%;
+            max-width: 650px;
+            max-height: 85vh;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+            transform: scale(0.9) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.2, 1);
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Botón cerrar flotante estilo Apple */
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(0, 0, 0, 0.1);
+            transform: scale(1.05);
+        }
+
+        .close-btn:active {
+            transform: scale(0.95);
+        }
+
+        .close-btn svg {
+            width: 14px;
+            height: 14px;
+            fill: #333;
+        }
+
+        /* Contenido del Modal */
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 25px;
+            line-height: 1.3;
+            padding-right: 20px;
+        }
+
+        .modal-body {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #333336;
+            text-align: left;
+        }
+
+        .modal-body p {
+            margin-bottom: 16px;
+        }
+
+        .modal-body ul {
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+            list-style-type: disc;
+        }
+
+        /* Personalización Scrollbar estilo iOS */
+        .modal-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .modal-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div class="card" onclick="openModal('modal1')">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.4z"/>
+                </svg>
+            </div>
+            <h2 class="card-title">Extracción desde bases de datos relacionales</h2>
+            <button class="card-btn">Ver más</button>
+        </div>
+
+        <div class="card" onclick="openModal('modal2')">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>
+                </svg>
+            </div>
+            <h2 class="card-title">Extracción desde bases de datos NoSQL</h2>
+            <button class="card-btn">Ver más</button>
+        </div>
+
+        <div class="card" onclick="openModal('modal3')">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/>
+                </svg>
+            </div>
+            <h2 class="card-title">Extracción mediante APIs (Application Programming Interfaces)</h2>
+            <button class="card-btn">Ver más</button>
+        </div>
+
+    </div>
+
+    <div id="modal1" class="modal-overlay" onclick="closeModalOnOverlay(event, 'modal1')">
+        <div class="modal-container">
+            <button class="close-btn" onclick="closeModal('modal1')">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+            <h3 class="modal-title">Extracción desde bases de datos relacionales</h3>
+            <div class="modal-body">
+                <p>Las bases de datos relacionales siguen siendo una de las principales fuentes de datos en BI. En este contexto, la extracción se realiza mediante consultas estructuradas que permiten recuperar información de tablas y vistas.</p>
+                <p>Existen dos enfoques principales:</p>
+                <ul>
+                    <li><strong>Extracción completa:</strong> se recupera la totalidad de los datos en cada ejecución.</li>
+                    <li><strong>Extracción incremental:</strong> solo se extraen los datos que han cambiado desde la última ejecución.</li>
+                </ul>
+                <p>La extracción incremental es ampliamente utilizada en entornos productivos, ya que reduce el volumen de datos procesados y mejora el rendimiento del sistema.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal2" class="modal-overlay" onclick="closeModalOnOverlay(event, 'modal2')">
+        <div class="modal-container">
+            <button class="close-btn" onclick="closeModal('modal2')">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+            <h3 class="modal-title">Extracción desde bases de datos NoSQL</h3>
+            <div class="modal-body">
+                <p>Con el crecimiento del Big Data, han surgido bases de datos NoSQL diseñadas para manejar grandes volúmenes de información no estructurada o semiestructurada. Estas bases incluyen tecnologías como MongoDB, Cassandra o Redis.</p>
+                <p>La extracción desde estos sistemas presenta características particulares:</p>
+                <ul>
+                    <li>Estructuras de datos flexibles (JSON, documentos).</li>
+                    <li>Ausencia de esquemas rígidos.</li>
+                    <li>Alto volumen y velocidad de datos.</li>
+                </ul>
+                <p>En este caso, los procesos ETL deben adaptarse a formatos menos estructurados, lo que implica un mayor esfuerzo en la fase de transformación (Provost & Fawcett, 2013).</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal3" class="modal-overlay" onclick="closeModalOnOverlay(event, 'modal3')">
+        <div class="modal-container">
+            <button class="close-btn" onclick="closeModal('modal3')">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+            </button>
+            <h3 class="modal-title">Extracción mediante APIs (Application Programming Interfaces)</h3>
+            <div class="modal-body">
+                <p>Las APIs se han convertido en una fuente clave de datos en BI, especialmente en entornos digitales donde las aplicaciones intercambian información constantemente.</p>
+                <p>La extracción mediante APIs permite acceder a datos en tiempo real o bajo demanda, lo que resulta especialmente útil para:</p>
+                <ul>
+                    <li>Integración con plataformas externas.</li>
+                    <li>Análisis de datos en línea.</li>
+                    <li>Consumo de servicios web.</li>
+                </ul>
+                <p>En este contexto, los datos suelen recibirse en formatos como JSON o XML, lo que requiere procesos adicionales de transformación para integrarlos en estructuras analíticas.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funciones para manejar los modales
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Evita scroll de fondo
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto'; // Restablece scroll de fondo
+        }
+
+        // Cierra el modal si se hace clic fuera del contenedor (en el desenfoque)
+        function closeModalOnOverlay(event, id) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal(id);
+            }
+        }
+
+        // Cierre de ventanas con la tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const activeModal = document.querySelector('.modal-overlay.active');
+                if (activeModal) {
+                    closeModal(activeModal.id);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
