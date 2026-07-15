@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inteligencia de Negocios - Bibliografía Clásica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-base: #483C9A; 
+            --accent-bright: #b3a6ff; 
+            --glass-bg: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(72, 60, 154, 0.4);
+            --text-main: #ffffff;
+            --text-dim: #dfdbf7;
+        }
+
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #05040f;
+            color: var(--text-main);
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden; cursor: default;
+        }
+
+        .fluid-background {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden; background: #070617; filter: blur(80px);
+        }
+        .fluid-layer { position: absolute; border-radius: 50%; opacity: 0.35; animation: fluidMove infinite alternate ease-in-out; }
+        .layer-1 { background: radial-gradient(circle, var(--accent-base) 0%, transparent 70%); width: 100vw; height: 100vw; top: -30%; left: -10%; animation-duration: 20s; }
+        .layer-2 { background: radial-gradient(circle, #1a1540 0%, transparent 70%); width: 80vw; height: 80vw; bottom: -20%; right: -10%; animation-duration: 25s; }
+        @keyframes fluidMove { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(10%, 5%) scale(1.1); } }
+
+        .nav-instruction {
+            width: 90vw; max-width: 1400px;
+            background: rgba(72, 60, 154, 0.15);
+            border: 1px dashed var(--accent-bright);
+            padding: 15px; border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem; color: var(--accent-bright);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .main-header { text-align: center; padding: 30px 20px; z-index: 1; }
+        .main-header h1 { font-weight: 300; font-size: 2rem; letter-spacing: 4px; text-transform: uppercase; margin: 0; background: linear-gradient(to right, #fff, var(--text-dim)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .main-header .line { width: 60px; height: 3px; background: var(--accent-bright); margin: 15px auto; }
+
+        .reference-grid {
+            display: grid; width: 90vw; max-width: 1400px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px; padding-bottom: 80px; z-index: 1;
+        }
+
+        .card {
+            font-family: 'Poppins', sans-serif;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 25px;
+            display: flex; flex-direction: column;
+            transition: all 0.3s ease;
+            min-height: 160px;
+        }
+        .card:hover { border-color: var(--accent-bright); transform: translateY(-5px); background: rgba(72, 60, 154, 0.12); box-shadow: 0 10px 20px rgba(72, 60, 154, 0.25); }
+
+        .author-tag { font-size: 0.75rem; font-weight: 600; color: var(--accent-bright); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+        .title { font-size: 0.9rem; font-weight: 400; line-height: 1.6; color: var(--text-main); margin-bottom: 15px; }
+
+        .footer-info {
+            font-size: 0.75rem; font-weight: 300; color: var(--text-dim);
+            border-top: 1px solid rgba(72, 60, 154, 0.3);
+            padding-top: 15px; margin-top: auto; word-break: break-word;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="fluid-background">
+        <div class="fluid-layer layer-1"></div>
+        <div class="fluid-layer layer-2"></div>
+    </div>
+
+    <div class="nav-instruction">
+        📊 <b>Instrucción de Navegación:</b> Consulta los fundamentos, metodologías de almacenes de datos, arquitectura de modelado y marcos analíticos de Inteligencia de Negocios (BI).
+    </div>
+
+    <header class="main-header">
+        <h1>Inteligencia de Negocios y Gestión de Datos</h1>
+        <div class="line"></div>
+    </header>
+
+    <main class="reference-grid" id="grid"></main>
+
+    <script>
+        const sources = [
+            { a: "Davenport, T. H. (2014)", t: "Big Data at Work: Dispelling the Myths, Uncovering the Opportunities", f: "Harvard Business Review Press" },
+            { a: "Few, S. (2012)", t: "Show Me the Numbers: Designing Tables and Graphs to Enlighten", f: "Analytics Press" },
+            { a: "Inmon, W. H. (2005)", t: "Building the Data Warehouse", f: "Wiley (Building the Data Warehouse Series)" },
+            { a: "Kimball, R., & Ross, M. (2013)", t: "The Data Warehouse Toolkit: The Definitive Guide to Dimensional Modeling", f: "John Wiley & Sons" },
+            { a: "Laudon, K. C., & Laudon, J. P. (2020)", t: "Management Information Systems: Managing the Digital Firm", f: "Pearson" },
+            { a: "Negash, S., & Gray, P. (2008)", t: "Business Intelligence", f: "Springer (Handbook on Decision Support Systems)" },
+            { a: "Power, D. J. (2002)", t: "Decision Support Systems: Concepts and Resources for Managers", f: "Greenwood Publishing Group" },
+            { a: "Provost, F., & Fawcett, T. (2013)", t: "Data Science for Business: What You Need to Know about Data Mining and Data-Analytic Thinking", f: "O’Reilly Media" },
+            { a: "Sharda, R., Delen, D., & Turban, E. (2018)", t: "Business Intelligence, Analytics, and Data Science: A Managerial Perspective", f: "Pearson" },
+            { a: "Watson, H. J., & Wixom, B. H. (2007)", t: "The Current State of Business Intelligence", f: "Computer Journal" }
+        ];
+
+        const grid = document.getElementById('grid');
+
+        sources.forEach((s) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            
+            card.innerHTML = `
+                <div class="author-tag">${s.a}</div>
+                <div class="title">${s.t}</div>
+                <div class="footer-info">${s.f}</div>
+            `;
+
+            grid.appendChild(card);
+        });
+    </script>
+</body>
+</html>
